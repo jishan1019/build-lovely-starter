@@ -81,7 +81,7 @@ export function SettingsDialog({
                     {label === "Description" ? (
                       <textarea className={field} rows={3} defaultValue={value} placeholder="Enter a short description" />
                     ) : (
-                      <input className={field} defaultValue={value} placeholder={label === "Link" ? "https://example.com" : `Enter your ${label.toLowerCase()}`} />
+                      <input className={field} defaultValue={value} placeholder={label === "Link" ? "https://example.com" : `Enter your ${(label ?? "").toLowerCase()}`} />
                     )}
                   </div>
                 ))}
