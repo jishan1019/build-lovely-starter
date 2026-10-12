@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { SettingsPage, type SettingsTab } from "@/components/upfounder/settings-page";
+import { type SettingsTab } from "@/components/upfounder/settings-page";
+import { Workspace } from "@/components/upfounder/workspace";
 
 const tabs: SettingsTab[] = ["workspace", "plans", "profile", "accounts"];
 
@@ -23,5 +24,5 @@ export const Route = createFileRoute("/settings")({
 function SettingsRoute() {
   const { tab } = Route.useSearch();
   const navigate = useNavigate();
-  return <SettingsPage tab={tab} onTabChange={(t) => navigate({ to: "/settings", search: { tab: t } })} />;
+  return <Workspace settings={{ tab, onTabChange: {(t) => navigate({ to: "/settings", search: { tab: t } })} }} />;
 }

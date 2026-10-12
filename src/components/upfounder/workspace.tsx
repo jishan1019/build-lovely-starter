@@ -42,6 +42,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { SettingsPage, type SettingsTab } from "./settings-page";
 import { LogOut, User, CreditCard, Link2 } from "lucide-react";
 
 export function Brand({ compact = false }: { compact?: boolean }) {
@@ -169,7 +170,13 @@ export function ProjectPreview({ project }: { project: Project }) {
     </div>
   );
 }
-export function Workspace({ library = false }: { library?: boolean }) {
+export function Workspace({
+  library = false,
+  settings,
+}: {
+  library?: boolean;
+  settings?: { tab: SettingsTab; onTabChange: (t: SettingsTab) => void };
+}) {
   const [collapsed, setCollapsed] = useState(false);
   const [query, setQuery] = useState("");
   const [tab, setTab] = useState("All projects");
@@ -228,7 +235,7 @@ export function Workspace({ library = false }: { library?: boolean }) {
           <Button
             asChild
             variant="ghost"
-            className={!library ? "nav-item active" : "nav-item"}
+            className={!library && !settings ? "nav-item active" : "nav-item"}
             title="Home"
           >
             <Link to="/">
@@ -298,6 +305,7 @@ export function Workspace({ library = false }: { library?: boolean }) {
             className="nav-item"
             onClick={() => setSettingsTab("profile")}
             title="Settings"
+            data-active={!!settings}
           >
             <Settings2 />
             {!collapsed && "Settings"}
@@ -327,7 +335,7 @@ export function Workspace({ library = false }: { library?: boolean }) {
             >
               {collapsed ? <PanelLeftOpen /> : <PanelLeftClose />}
             </Button>
-            <span>{library ? "My projects" : "Workspace"}</span>
+            <span>{settings ? "Settings" : library ? "My projects" : "Workspace"}</span>
           </div>
           <div>
             <span className="header-status">
@@ -361,6 +369,10 @@ export function Workspace({ library = false }: { library?: boolean }) {
           </div>
         </header>
         <main className="workspace-content">
+          {settings ? (
+            <SettingsPage tab={settings.tab} onTabChange={settings.onTabChange} />
+          ) : (
+          <>
           {!library && (
             <section className="creation-section">
               <div className="powered-label">
@@ -603,6 +615,8 @@ export function Workspace({ library = false }: { library?: boolean }) {
               </div>
             )}
           </section>
+          </>
+          )}
           <footer className="workspace-footer">
             <span>Made for the ideas that won’t leave you alone.</span>
             <span>
