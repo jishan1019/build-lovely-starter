@@ -1,9 +1,6 @@
 import { useState } from "react";
 import { CreditCard, Crown, Github, Gitlab, Info, Link2, User, Zap, Check, Box } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Link } from "@tanstack/react-router";
-import { ArrowLeft } from "lucide-react";
-import { Brand } from "./workspace";
 
 export type SettingsTab = "workspace" | "plans" | "profile" | "accounts";
 
@@ -33,14 +30,8 @@ export function SettingsPage({
   );
   const preview = (msg: string) => setNotice(`${msg} — this is a design preview, nothing is saved yet.`);
   return (
-    <div className="min-h-screen bg-background">
-      <header className="flex items-center justify-between border-b border-border px-6 h-14">
-        <Brand />
-        <Button asChild variant="ghost" size="sm">
-          <Link to="/"><ArrowLeft /> Back to workspace</Link>
-        </Button>
-      </header>
-        <div className="mx-auto max-w-5xl grid md:grid-cols-[220px_1fr] gap-6 px-6 py-8">
+    <div>
+        <div className="mx-auto max-w-5xl grid md:grid-cols-[220px_1fr] gap-6 py-4">
           <nav className="md:border-r border-border pr-4 space-y-1">
             <h1 className="px-2 pb-4 text-2xl font-semibold">Settings</h1>
             <p className="px-2 pb-1 text-[11px] font-semibold tracking-wider text-muted-foreground">WORKSPACE</p>
