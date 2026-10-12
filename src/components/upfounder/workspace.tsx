@@ -34,7 +34,15 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { projects, type Project } from "./project-data";
-import { SettingsDialog, type SettingsTab } from "./settings-dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { LogOut, User, CreditCard, Link2 } from "lucide-react";
 
 export function Brand({ compact = false }: { compact?: boolean }) {
   return (
@@ -170,7 +178,8 @@ export function Workspace({ library = false }: { library?: boolean }) {
   const [dialog, setDialog] = useState("");
   const [sort, setSort] = useState("recent");
   const [attachment, setAttachment] = useState("");
-  const [settingsTab, setSettingsTab] = useState<SettingsTab | null>(null);
+  const setSettingsTab = (tab: "workspace" | "plans" | "profile" | "accounts") =>
+    navigate({ to: "/settings", search: { tab } });
   const upload = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
   const visible = projects.filter(
@@ -329,7 +338,26 @@ export function Workspace({ library = false }: { library?: boolean }) {
               <Sparkles />
               What’s new
             </Button>
-            <span className="user-avatar small">LA</span>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="rounded-full" aria-label="Account menu">
+                  <span className="user-avatar small">LA</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuLabel>
+                  Lamar Austin
+                  <p className="text-xs font-normal text-muted-foreground">lamar@example.com</p>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onSelect={() => setSettingsTab("profile")}><User /> Profile</DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => setSettingsTab("plans")}><CreditCard /> Plans & credits</DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => setSettingsTab("accounts")}><Link2 /> Connected accounts</DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => setSettingsTab("workspace")}><Settings2 /> Settings</DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onSelect={() => setDialog("Sign out")}><LogOut /> Sign out</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </header>
         <main className="workspace-content">
@@ -616,12 +644,6 @@ export function Workspace({ library = false }: { library?: boolean }) {
           )}
         </DialogContent>
       </Dialog>
-      <SettingsDialog
-        open={!!settingsTab}
-        tab={settingsTab ?? "profile"}
-        onTabChange={setSettingsTab}
-        onOpenChange={(o) => !o && setSettingsTab(null)}
-      />
     </div>
   );
 }
