@@ -258,7 +258,7 @@ export function Workspace({ library = false }: { library?: boolean }) {
             <p>PROJECTS</p>
             {projects.map((p, i) => (
               <Link key={p.id} to="/editor" search={{ project: p.id }}>
-                <span className={`project-dot dot-${i}`} />
+                <span className={`project-dot dot-${i % 3}`} />
                 <span>{p.name.split(" · ")[0]}</span>
               </Link>
             ))}
