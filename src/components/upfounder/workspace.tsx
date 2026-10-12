@@ -302,10 +302,9 @@ export function Workspace({
           )}
           <Button
             variant="ghost"
-            className="nav-item"
+            className={settings ? "nav-item active" : "nav-item"}
             onClick={() => setSettingsTab("profile")}
             title="Settings"
-            data-active={!!settings}
           >
             <Settings2 />
             {!collapsed && "Settings"}

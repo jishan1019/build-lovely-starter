@@ -24,5 +24,5 @@ export const Route = createFileRoute("/settings")({
 function SettingsRoute() {
   const { tab } = Route.useSearch();
   const navigate = useNavigate();
-  return <Workspace settings={{ tab, onTabChange: {(t) => navigate({ to: "/settings", search: { tab: t } })} }} />;
+  return <Workspace settings={{ tab, onTabChange: (t) => navigate({ to: "/settings", search: { tab: t } }) }} />;
 }
