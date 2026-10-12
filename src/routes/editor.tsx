@@ -23,7 +23,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 export const Route = createFileRoute("/editor")({
-  validateSearch: (search: Record<string, unknown>): { project: string; prompt?: string } => ({
+  validateSearch: (search: Record<string, unknown>): { project: string; prompt?: string | undefined } => ({
     project: typeof search["project"] === "string" ? search["project"] : "mochi",
     prompt: typeof search["prompt"] === "string" ? search["prompt"] : undefined,
   }),

@@ -34,6 +34,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { projects, type Project } from "./project-data";
+import { SettingsDialog, type SettingsTab } from "./settings-dialog";
 
 export function Brand({ compact = false }: { compact?: boolean }) {
   return (
@@ -169,6 +170,7 @@ export function Workspace({ library = false }: { library?: boolean }) {
   const [dialog, setDialog] = useState("");
   const [sort, setSort] = useState("recent");
   const [attachment, setAttachment] = useState("");
+  const [settingsTab, setSettingsTab] = useState<SettingsTab | null>(null);
   const upload = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
   const visible = projects.filter(
@@ -189,7 +191,7 @@ export function Workspace({ library = false }: { library?: boolean }) {
         <Button
           variant="outline"
           className="workspace-switch"
-          onClick={() => setDialog("Workspace")}
+          onClick={() => setSettingsTab("workspace")}
         >
           <span className="workspace-avatar">LA</span>
           {!collapsed && (
@@ -253,13 +255,17 @@ export function Workspace({ library = false }: { library?: boolean }) {
         </div>
         {!collapsed && (
           <div className="sidebar-recents">
-            <p>RECENT PROJECTS</p>
-            {projects.slice(0, 3).map((p, i) => (
+            <p>PROJECTS</p>
+            {projects.map((p, i) => (
               <Link key={p.id} to="/editor" search={{ project: p.id }}>
-                <span className={`project-dot dot-${i}`} />
+                <span className={`project-dot dot-${i % 3}`} />
                 <span>{p.name.split(" · ")[0]}</span>
               </Link>
             ))}
+            <Link to="/projects" className="text-muted-foreground">
+              <Plus size={13} />
+              <span>View all projects</span>
+            </Link>
           </div>
         )}
         <div className="sidebar-bottom">
@@ -273,7 +279,7 @@ export function Workspace({ library = false }: { library?: boolean }) {
               <div className="credit-track">
                 <span />
               </div>
-              <Button variant="outline" className="w-full" onClick={() => setDialog("Plans")}>
+              <Button variant="outline" className="w-full" onClick={() => setSettingsTab("plans")}>
                 Explore plans <ArrowUpRight />
               </Button>
             </div>
@@ -281,13 +287,13 @@ export function Workspace({ library = false }: { library?: boolean }) {
           <Button
             variant="ghost"
             className="nav-item"
-            onClick={() => setDialog("Settings")}
+            onClick={() => setSettingsTab("profile")}
             title="Settings"
           >
             <Settings2 />
             {!collapsed && "Settings"}
           </Button>
-          <div className="profile">
+          <div className="profile cursor-pointer" role="button" tabIndex={0} onClick={() => setSettingsTab("profile")}>
             <span className="user-avatar">LA</span>
             {!collapsed && (
               <>
@@ -610,6 +616,12 @@ export function Workspace({ library = false }: { library?: boolean }) {
           )}
         </DialogContent>
       </Dialog>
+      <SettingsDialog
+        open={!!settingsTab}
+        tab={settingsTab ?? "profile"}
+        onTabChange={setSettingsTab}
+        onOpenChange={(o) => !o && setSettingsTab(null)}
+      />
     </div>
   );
 }
