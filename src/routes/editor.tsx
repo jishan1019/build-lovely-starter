@@ -130,7 +130,7 @@ function Editor() {
             <Share2 />
           </Button>
           <Button variant="outline" size="sm" asChild>
-            <Link to="/settings">
+            <Link to="/settings" search={{ tab: "plans" }}>
               <Crown /> Upgrade
             </Link>
           </Button>
