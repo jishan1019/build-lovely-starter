@@ -1,27 +1,37 @@
 import { useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import {
+  ArrowLeft,
+  ArrowRight,
   ArrowUp,
   ArrowUpRight,
-  Check,
+  ChevronDown,
+  ChevronRight,
   Code2,
+  Copy,
+  Crown,
+  Download,
+  FileCode2,
+  FileText,
+  Folder,
   Globe,
   ImagePlus,
+  MessageSquareQuote,
+  Mic,
   Monitor,
+  PanelLeft,
+  RotateCw,
+  Share2,
+  ShieldCheck,
   Smartphone,
   Sparkles,
-  Undo2,
+  Upload,
+  CircleCheck,
+  Check,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Brand } from "@/components/upfounder/workspace";
 import { projects } from "@/components/upfounder/project-data";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
+
 export const Route = createFileRoute("/editor")({
   validateSearch: (search: Record<string, unknown>): { project: string; prompt?: string | undefined } => ({
     project: typeof search["project"] === "string" ? search["project"] : "mochi",
@@ -39,224 +49,292 @@ export const Route = createFileRoute("/editor")({
   }),
   component: Editor,
 });
+
+const files = ["Hero.tsx", "App.tsx", "index.css"] as const;
+const suggestions = ["Add a newsletter signup", "Show a featured products row", "Add a testimonials strip"];
+
 function Editor() {
   const search = Route.useSearch();
   const project = projects.find((p) => p.id === search.project) ?? projects[0];
   const [mobile, setMobile] = useState(false);
   const [code, setCode] = useState(false);
+  const [chatOpen, setChatOpen] = useState(true);
+  const [changesOpen, setChangesOpen] = useState(false);
+  const [file, setFile] = useState<string>("App.tsx");
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<string[]>([]);
-  const [modal, setModal] = useState("");
+  const [publishOpen, setPublishOpen] = useState(false);
+  const [notice, setNotice] = useState("");
   if (!project) return null;
-  const title = search.project === "new" ? "Untitled project" : project.name;
-  const isCat = project.kind === "cat";
-  const submit = () => {
-    if (message.trim()) {
-      setMessages((m) => [...m, message.trim()]);
+  const name = project.name.split(" · ")[0] ?? "Project";
+  const title = search.project === "new" ? "Untitled project" : name;
+  const prompt = search.prompt ?? `Create a simple hero section for ${name}`;
+  const flash = (m: string) => {
+    setNotice(`${m} — design preview only.`);
+    setTimeout(() => setNotice(""), 2600);
+  };
+  const submit = (text = message) => {
+    if (text.trim()) {
+      setMessages((m) => [...m, text.trim()]);
       setMessage("");
     }
   };
+  const source =
+    file === "Hero.tsx"
+      ? `export default function Hero() {\n  return (\n    <section className="hero">\n      <p className="eyebrow">${name.toUpperCase()}</p>\n      <h1>Considered design for everyday living</h1>\n      <a href="#collection">Explore collection</a>\n    </section>\n  );\n}`
+      : file === "index.css"
+        ? `:root {\n  --brand: #191919;\n  --paper: #faf8f5;\n}\n\nbody {\n  font-family: "Manrope", sans-serif;\n  background: var(--paper);\n}`
+        : `import Hero from "./components/Hero";\n\nexport default function App() {\n  return (\n    <main>\n      <Hero />\n    </main>\n  );\n}`;
+
   return (
-    <div className="editor">
-      <header className="editor-header">
-        <div>
-          <Brand />
-          <span className="editor-project-name">{title}</span>
+    <div className="gen">
+      <header className="gen-header">
+        <div className="gen-header-left">
+          <Link to="/" className="gen-brand">
+            <span className="gen-brand-mark">✳</span>
+            <span>
+              <b>
+                {title} <ChevronDown size={13} />
+              </b>
+              <small>Generation mode</small>
+            </span>
+          </Link>
         </div>
-        <div>
-          <span className="editor-toast">
-            <Check size={13} />
-          </span>
-          <Button variant="outline" size="sm" onClick={() => setModal("Share project")}>
-            Share
+        <div className="gen-header-mid">
+          <Button variant="ghost" size="icon" aria-label="Toggle chat" onClick={() => setChatOpen((o) => !o)}>
+            <PanelLeft />
+          </Button>
+          <div className="gen-segment">
+            <Button variant={code ? "ghost" : "secondary"} size="sm" onClick={() => setCode(false)}>
+              <Globe /> Preview
+            </Button>
+            <Button variant={code ? "secondary" : "ghost"} size="sm" onClick={() => setCode(true)}>
+              <Code2 /> Code
+            </Button>
+          </div>
+        </div>
+        <div className="gen-address">
+          <Button variant="ghost" size="icon" aria-label={mobile ? "Desktop preview" : "Mobile preview"} onClick={() => setMobile((m) => !m)}>
+            {mobile ? <Smartphone /> : <Monitor />}
+          </Button>
+          <span>/{name.toLowerCase()}</span>
+          <Button variant="ghost" size="icon" aria-label="Open in new tab" onClick={() => flash("Open in new tab")}>
             <ArrowUpRight />
           </Button>
-          <Button size="sm" onClick={() => setModal("Publish project")}>
-            <Globe />
-            Publish
+          <Button variant="ghost" size="icon" aria-label="Reload preview" onClick={() => setMessages([])}>
+            <RotateCw />
+          </Button>
+        </div>
+        <div className="gen-header-right">
+          <Button variant="ghost" size="icon" aria-label="Share" onClick={() => flash("Sharing")}>
+            <Share2 />
+          </Button>
+          <Button variant="outline" size="sm" asChild>
+            <Link to="/settings" search={{ tab: "plans" }}>
+              <Crown /> Upgrade
+            </Link>
+          </Button>
+          <Button size="sm" onClick={() => setPublishOpen((o) => !o)}>
+            <Globe /> Publish
           </Button>
           <span className="user-avatar small">LA</span>
         </div>
       </header>
-      <div className="editor-body">
-        <aside className="editor-chat">
-          <div className="chat-heading">
-            <Sparkles size={17} />
-            Your creative partner
-          </div>
-          <div className="chat-messages">
-            <div className="user-message">
-              {search.prompt ??
-                `Create a beautiful ${project.category.toLowerCase()} for ${project.name.split(" · ")[0]}.`}
-            </div>
-            <div className="assistant-message">
-              <Sparkles size={17} />
+
+      <div className="gen-body">
+        {chatOpen && (
+          <aside className="gen-chat">
+            <div className="gen-messages">
+              <div className="gen-user">{prompt}</div>
+              <p className="gen-ai">
+                Design chosen for this site: <b>Modern Commerce</b> — Sora headings, Manrope body text and a warm
+                neutral palette. Building the pages now.
+              </p>
+              <div className="gen-changes">
+                <Button variant="ghost" className="gen-changes-toggle" onClick={() => setChangesOpen((o) => !o)}>
+                  {changesOpen ? <ChevronDown /> : <ChevronRight />}
+                  Explore changes
+                  <span>{files.length + 2}</span>
+                </Button>
+                {changesOpen && (
+                  <ul>
+                    {["Hero.tsx", "App.tsx", "index.css", "index.html", "hero.jpg"].map((f) => (
+                      <li key={f}>
+                        <Check size={13} /> {f}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
               <div>
-                <p>
-                  {search.project === "new"
-                    ? "Here’s a sample design to explore your idea."
-                    : "Your project is ready for its next chapter."}{" "}
-                  I’ve put together a clean layout with thoughtful typography and room for your
-                  content.
-                </p>
-                <div className="change-status">
-                  <Check size={14} />
-                  Design preview ready
-                </div>
-                <p>What would you like to change?</p>
-              </div>
-            </div>
-            {messages.map((m, i) => (
-              <div key={i}>
-                <div className="user-message">{m}</div>
-                <div className="assistant-message">
-                  <Sparkles size={17} />
-                  <p>“{m}” is noted for this preview. Live AI editing isn’t connected yet.</p>
+                <p className="gen-label">Generated 1 image</p>
+                <div className="gen-images">
+                  <small>Generated images (1)</small>
+                  <img src={project.image} alt="" width={64} height={64} />
                 </div>
               </div>
-            ))}
-          </div>
-          <div className="editor-composer">
-            <textarea
-              aria-label="Request a change"
-              placeholder="What would you like to change?"
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && !e.shiftKey) {
-                  e.preventDefault();
-                  submit();
-                }
-              }}
-            />
-            <div>
-              <span>Design preview</span>
-              <Button
-                size="icon"
-                aria-label="Send change"
-                disabled={!message.trim()}
-                onClick={submit}
-              >
-                <ArrowUp />
-              </Button>
-            </div>
-          </div>
-        </aside>
-        <section className="editor-canvas">
-          <div className="canvas-toolbar">
-            <div>
-              <Button
-                variant={code ? "ghost" : "secondary"}
-                size="sm"
-                onClick={() => setCode(false)}
-              >
-                <Globe />
-                Preview
-              </Button>
-              <Button
-                variant={code ? "secondary" : "ghost"}
-                size="sm"
-                onClick={() => setCode(true)}
-              >
-                <Code2 />
-                Code
-              </Button>
-            </div>
-            <span className="preview-address">
-              {(project.name.split(" · ")[0] ?? "project").toLowerCase()} /
-            </span>
-            <div>
-              <Button
-                variant={!mobile ? "secondary" : "ghost"}
-                size="icon"
-                title="Desktop preview"
-                aria-label="Desktop preview"
-                onClick={() => setMobile(false)}
-              >
-                <Monitor />
-              </Button>
-              <Button
-                variant={mobile ? "secondary" : "ghost"}
-                size="icon"
-                title="Mobile preview"
-                aria-label="Mobile preview"
-                onClick={() => setMobile(true)}
-              >
-                <Smartphone />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                title="Reset changes"
-                aria-label="Reset changes"
-                onClick={() => setMessages([])}
-              >
-                <Undo2 />
-              </Button>
-            </div>
-          </div>
-          <div className={`canvas-preview ${mobile ? "mobile-preview" : ""}`}>
-            {code ? (
-              <pre className="code-preview">{`// Read-only design preview\n\nexport default function Website() {\n  return (\n    <main>\n      <Navigation />\n      <Cover title="${isCat ? "Meet Mochi." : project.name.split(" · ")[0]}" />\n      <About />\n    </main>\n  );\n}`}</pre>
-            ) : (
-              <div className="editor-site">
-                <nav className="preview-site-nav">
-                  <b>
-                    {isCat ? "mochi." : (project.name.split(" · ")[0] ?? "project").toLowerCase()}
-                  </b>
-                  <span>About &nbsp; · &nbsp; Gallery &nbsp; · &nbsp; Contact</span>
-                </nav>
-                <div className="editor-site-cover">
-                  <img
-                    src={project.image || projects[1]?.image || projects[0]?.image}
-                    alt={isCat ? "Mochi the orange tabby cat" : project.name}
-                    width={1024}
-                    height={640}
-                  />
-                  <div>
-                    <h1>
-                      {isCat
-                        ? "A little cat. A lot of personality."
-                        : project.kind === "coast"
-                          ? "Go somewhere that stays with you."
-                          : "Considered design. Everyday living."}
-                    </h1>
-                    <p>
-                      {isCat
-                        ? "Meet Mochi, your daily dose of happy."
-                        : "A space for the things that inspire you."}
-                    </p>
-                  </div>
-                </div>
-                <div className="editor-site-intro">
-                  <h2>{isCat ? "Small paws. Big adventures." : "Made with intention."}</h2>
-                  <p>
-                    {isCat
-                      ? "Sunbeam enthusiast. Professional napper. Your new favorite friend."
-                      : "Beautiful moments, thoughtfully brought together."}
+              <p className="gen-ai">
+                Your {name} hero section is ready in the preview, with a headline, supporting text and a call to
+                action. Want any changes?
+              </p>
+              {messages.map((m, i) => (
+                <div key={i} className="gen-messages-pair">
+                  <div className="gen-user">{m}</div>
+                  <p className="gen-ai">
+                    <Sparkles size={14} /> “{m}” is noted. Live AI editing isn’t connected in this preview yet.
                   </p>
                 </div>
+              ))}
+            </div>
+            <div className="gen-suggestions">
+              {suggestions.map((s) => (
+                <Button key={s} variant="outline" size="sm" onClick={() => submit(s)}>
+                  {s}
+                </Button>
+              ))}
+            </div>
+            <div className="gen-composer">
+              <textarea
+                aria-label="Ask AI to modify your app"
+                placeholder="Ask AI to modify your app…"
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    submit();
+                  }
+                }}
+              />
+              <div>
+                <Button variant="ghost" size="icon" aria-label="Attach image" onClick={() => flash("Image upload")}>
+                  <ImagePlus />
+                </Button>
+                <Button variant="ghost" size="icon" aria-label="Voice input" onClick={() => flash("Voice input")}>
+                  <Mic />
+                </Button>
+                <Button size="icon" className="ml-auto" aria-label="Send" disabled={!message.trim()} onClick={() => submit()}>
+                  <ArrowUp />
+                </Button>
               </div>
-            )}
-          </div>
+            </div>
+          </aside>
+        )}
+
+        <section className="gen-canvas">
+          {code ? (
+            <div className="gen-code">
+              <nav className="gen-explorer" aria-label="Files">
+                <p>
+                  <Folder size={14} /> Explorer
+                </p>
+                <span className="gen-dir">
+                  <ChevronDown size={12} /> src
+                </span>
+                <span className="gen-dir nested">
+                  <ChevronDown size={12} /> components
+                </span>
+                {files.map((f) => (
+                  <Button
+                    key={f}
+                    variant="ghost"
+                    className={`gen-file ${f === "Hero.tsx" ? "deep" : ""} ${file === f ? "active" : ""}`}
+                    onClick={() => setFile(f)}
+                  >
+                    {f.endsWith(".css") ? <FileText /> : <FileCode2 />} {f}
+                  </Button>
+                ))}
+              </nav>
+              <div className="gen-editor">
+                <div className="gen-tab">
+                  <FileCode2 size={13} /> {file}
+                </div>
+                <div className="gen-editor-bar">
+                  <span>src/{file === "Hero.tsx" ? "components/" : ""}{file}</span>
+                  <div>
+                    <Button variant="ghost" size="sm" onClick={() => setMessage(`In ${file}, `)}>
+                      <MessageSquareQuote /> Reference in chat
+                    </Button>
+                    <Button variant="ghost" size="sm" onClick={() => { void navigator.clipboard?.writeText(source); flash("Copied"); }}>
+                      <Copy /> Copy
+                    </Button>
+                    <Button variant="ghost" size="sm" onClick={() => flash("Download")}>
+                      <Download /> Download
+                    </Button>
+                  </div>
+                </div>
+                <pre>
+                  {source.split("\n").map((l, i) => (
+                    <div key={i}>
+                      <span>{i + 1}</span>
+                      {l || " "}
+                    </div>
+                  ))}
+                </pre>
+              </div>
+            </div>
+          ) : (
+            <div className={`gen-stage ${mobile ? "mobile" : ""}`}>
+              <div className="gen-site">
+                <div className="gen-site-copy">
+                  <p className="gen-eyebrow">{name.toUpperCase()} STUDIO</p>
+                  <h1>Considered goods designed for everyday living</h1>
+                  <p>Explore a collection of understated objects and timeless essentials, made with enduring materials in mind.</p>
+                  <div className="gen-site-cta">
+                    <Button onClick={() => flash("Explore collection")}>
+                      Explore collection <ArrowRight />
+                    </Button>
+                    <Button variant="outline" onClick={() => flash("Learn our story")}>Learn our story</Button>
+                  </div>
+                  <ul>
+                    <li><Sparkles size={15} /> Thoughtful essentials</li>
+                    <li><ShieldCheck size={15} /> Built to last</li>
+                    <li><CircleCheck size={15} /> Consciously crafted</li>
+                  </ul>
+                </div>
+                <img src={project.image} alt={project.name} width={1024} height={640} />
+              </div>
+            </div>
+          )}
+
+          {publishOpen && (
+            <div className="gen-publish" role="dialog" aria-label="Confirm deployment">
+              <header>
+                <Button variant="ghost" size="icon" aria-label="Close" onClick={() => setPublishOpen(false)}>
+                  <ArrowLeft />
+                </Button>
+                Confirm deployment
+              </header>
+              <div className="gen-publish-body">
+                <span className="gen-publish-icon"><Globe /></span>
+                <h3>Ready to publish?</h3>
+                <p>Your project will be built and deployed to make it available online.</p>
+                <label>
+                  <b>Site title <i>*</i></b>
+                  <input defaultValue={title} />
+                </label>
+                <label>
+                  <b>Description <small>(optional)</small></b>
+                  <textarea rows={2} placeholder="A brief description of your site" />
+                </label>
+                <div>
+                  <b>Site icon <small>(optional)</small></b>
+                  <Button variant="outline" className="gen-upload" onClick={() => flash("Icon upload")}>
+                    <Upload /> Upload icon (PNG, JPG, SVG, ICO)
+                  </Button>
+                </div>
+              </div>
+              <footer>
+                <Button variant="outline" onClick={() => setPublishOpen(false)}>Cancel</Button>
+                <Button onClick={() => { setPublishOpen(false); flash("Deploy"); }}>
+                  <Globe /> Deploy
+                </Button>
+              </footer>
+            </div>
+          )}
+          {notice && <div className="gen-notice">{notice}</div>}
         </section>
       </div>
-      <Dialog
-        open={!!modal}
-        onOpenChange={(o) => {
-          if (!o) setModal("");
-        }}
-      >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{modal}</DialogTitle>
-            <DialogDescription>
-              This editor is a design preview. Live project sharing and publishing aren’t connected
-              yet.
-            </DialogDescription>
-          </DialogHeader>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
