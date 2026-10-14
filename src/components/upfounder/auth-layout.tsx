@@ -1,7 +1,8 @@
 import { useState, type ReactNode } from "react";
-import { ArrowRight, Eye, EyeOff, Github, Info, Lock, Mail, Sparkles, User } from "lucide-react";
+import { Check, Eye, EyeOff, Github, Info, Lock, Mail, Sparkles, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Brand } from "@/components/upfounder/workspace";
+import interior from "@/assets/interior.jpg";
 
 export function AuthLayout({ title, subtitle, children, footer }: { title: string; subtitle: string; children: ReactNode; footer?: ReactNode }) {
   return (
@@ -17,28 +18,36 @@ export function AuthLayout({ title, subtitle, children, footer }: { title: strin
       </main>
       <aside className="auth-showcase" aria-hidden="true">
         <div className="auth-glow" />
-        <div className="auth-stack">
-          <div className="auth-bubble user">
+        <div className="auth-show-head">
+          <span className="auth-pill"><Sparkles size={13} /> AI website builder</span>
+          <h2>Describe it. <span>Watch it come to life.</span></h2>
+          <p>Turn a single sentence into a polished, ready-to-share website.</p>
+        </div>
+        <div className="auth-mock">
+          <div className="auth-browser">
+            <div className="auth-browser-bar"><i /><i /><i /><span>ceramics-studio.site</span></div>
+            <div className="auth-browser-body">
+              <img src={interior} alt="" />
+              <div>
+                <small>STUDIO CLAY</small>
+                <b>Handmade pieces for slow mornings.</b>
+                <span className="auth-fake-btn">Shop the collection</span>
+              </div>
+            </div>
+          </div>
+          <div className="auth-float prompt">
             <span className="auth-avatar">LA</span>
-            <p>Build me a calm portfolio site for my ceramics studio</p>
+            <p>Build a calm site for my ceramics studio</p>
           </div>
-          <div className="auth-bubble ai">
-            <span className="auth-ai-icon"><Sparkles size={16} /></span>
-            <div>
-              <b>On it — here’s your first draft.</b>
-              <p>Warm palette, gallery grid and a contact page, ready to refine.</p>
-              <div className="auth-progress"><span /></div>
-            </div>
-          </div>
-          <div className="auth-bubble cta">
-            <div>
-              <b>Build anything.</b>
-              <p>From idea to live site in minutes.</p>
-            </div>
-            <span className="auth-cta-icon"><ArrowRight size={18} /></span>
+          <div className="auth-float done">
+            <span className="auth-ai-icon"><Check size={15} /></span>
+            <div><b>Draft ready</b><p>3 pages · 12 seconds</p></div>
           </div>
         </div>
-        <p className="auth-quote">“Your creative partner for every idea.”</p>
+        <div className="auth-proof">
+          <div className="auth-faces"><span>AM</span><span>JR</span><span>KS</span></div>
+          <p><b>Loved by builders</b> shipping their ideas every day</p>
+        </div>
       </aside>
     </div>
   );
