@@ -362,7 +362,7 @@ export function Workspace({
                 <DropdownMenuItem onSelect={() => setSettingsTab("accounts")}><Link2 /> Connected accounts</DropdownMenuItem>
                 <DropdownMenuItem onSelect={() => setSettingsTab("workspace")}><Settings2 /> Settings</DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onSelect={() => setDialog("Sign out")}><LogOut /> Sign out</DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => void navigate({ to: "/login" })}><LogOut /> Sign out</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
